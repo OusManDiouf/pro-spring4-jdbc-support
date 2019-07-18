@@ -73,7 +73,10 @@ public class AnnotationJdbcDaoSample {
 
 //        contactDAO.insertWithDetail(contact); // one shot !
 
-        listContact(contactDAO.findAllWithDetail());
+//        listContact(contactDAO.findAllWithDetail());
+
+//        Testing the Stored Function in MySQL
+        System.out.println("---> "+ contactDAO.findFirstNameById(6L));
 
     }
 

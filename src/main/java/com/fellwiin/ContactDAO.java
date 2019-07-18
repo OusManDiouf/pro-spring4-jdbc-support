@@ -16,8 +16,5 @@ public interface ContactDAO {
 
     List<Contact> findAllWithDetail();
 
-//    String findFirstNameById(Long id);
-//
-//
-//
+    String findFirstNameById(Long id);
 }

@@ -35,6 +35,7 @@ public class JdbcContactDAO implements ContactDAO, InitializingBean {
     private SelectContactByFirstName selectContactByFirstName;
     private UpdateContact updateContact;
     private InsertContact insertContact;
+    private StoredFunctionFirstNameById storedFunctionFirstNameById;
 
     @Resource(name = "dataSource")
     public void setDataSource(DataSource dataSource) {
@@ -43,6 +44,7 @@ public class JdbcContactDAO implements ContactDAO, InitializingBean {
         this.selectContactByFirstName = new SelectContactByFirstName(dataSource);
         this.updateContact = new UpdateContact(dataSource);
         this.insertContact = new InsertContact(dataSource);
+        this.storedFunctionFirstNameById = new StoredFunctionFirstNameById(dataSource);
     }
 
     public DataSource getDataSource() {
@@ -165,6 +167,12 @@ public class JdbcContactDAO implements ContactDAO, InitializingBean {
             }
             return new ArrayList<>(map.values());
         });
+    }
+
+    @Override
+    public String findFirstNameById(Long id) {
+        List<String> result = this.storedFunctionFirstNameById.execute(id);
+        return result.get(0);
     }
 
 
