@@ -9,12 +9,12 @@ public interface ContactDAO {
     List<Contact> findByFirstName(String firstName);
 
     void update(Contact contact);
-//
+
+    void insert(Contact contact);
+
 //    String findFirstNameById(Long id);
 //
 //    List<Contact> findAllWithDetail();
-//
-//    void insert(Contact contact);
 //
 //    void insertWithDetail(Contact contact);
 //

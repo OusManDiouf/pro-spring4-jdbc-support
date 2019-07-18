@@ -16,11 +16,13 @@ public class AnnotationJdbcDaoSample {
 
         ContactDAO contactDAO = ctx.getBean("contactDAO", ContactDAO.class);
 
+
         List<Contact> contactListFindAll = contactDAO.findAll();
 //        listContact(contactListFindAll);
 
+
         List<Contact> contactListByFirstName = contactDAO.findByFirstName("Chris");
-        listContact(contactListByFirstName);
+//        listContact(contactListByFirstName);
 
         Contact contactToUpdate = new Contact();
         contactToUpdate.setId(1L);
@@ -30,9 +32,18 @@ public class AnnotationJdbcDaoSample {
                 (new GregorianCalendar(1997, Calendar.DECEMBER, 12))
                         .getTime().getTime())
         );
-        contactDAO.update(contactToUpdate);
-        listContact(contactListByFirstName);
+//        contactDAO.update(contactToUpdate);
+//        listContact(contactListByFirstName);
 
+        Contact contactToInsert = new Contact();
+        contactToInsert.setFirstName("Augustus");
+        contactToInsert.setLastName("Gibond");
+        contactToInsert.setBirthDate(new Date(
+                (new GregorianCalendar(2019, Calendar.DECEMBER, 1))
+                        .getTime().getTime())
+        );
+        contactDAO.insert(contactToInsert);
+        listContact(contactDAO.findAll());
     }
 
     private static void listContact(List<Contact> contactList) {
