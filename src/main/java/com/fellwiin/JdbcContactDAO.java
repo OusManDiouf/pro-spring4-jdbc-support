@@ -6,12 +6,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,10 +94,77 @@ public class JdbcContactDAO implements ContactDAO, InitializingBean {
         paramMap.put("birth_date", contact.getBirthDate());
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        insertContact.updateByNamedParam(paramMap,keyHolder);
+        insertContact.updateByNamedParam(paramMap, keyHolder);
         contact.setId(keyHolder.getKey().longValue());
 
         LOG.info("New contact inserted with id: " + contact.getId() + "\n");
+    }
+
+    //    TODO: get rid of the duplicate by refactoring
+    @Override
+    public void insertWithDetail(Contact contact) {
+
+        InsertContactTelDetail insertContactTelDetail = new InsertContactTelDetail(dataSource);
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("first_name", contact.getFirstName());
+        paramMap.put("last_name", contact.getLastName());
+        paramMap.put("birth_date", contact.getBirthDate());
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        insertContact.updateByNamedParam(paramMap, keyHolder);
+        contact.setId(keyHolder.getKey().longValue());
+        LOG.info("New contact inserted with id: " + contact.getId());
+
+        List<ContactTelDetail> contactTelDetails = contact.getContactTelDetails();
+
+        if (contactTelDetails != null) {
+            for (ContactTelDetail contactTelDetail : contactTelDetails) {
+                paramMap = new HashMap<>();
+                paramMap.put("contact_id", contact.getId());
+                paramMap.put("tel_type", contactTelDetail.getTelType());
+                paramMap.put("tel_number", contactTelDetail.getTelNumber());
+                insertContactTelDetail.updateByNamedParam(paramMap);
+            }
+        }
+
+        insertContactTelDetail.flush();
+    }
+
+    @Override
+    public List<Contact> findAllWithDetail() {
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(getDataSource());
+
+        String sql = "select c.id, c.first_name, c.last_name, c.birth_date" +
+                ", t.id as contact_tel_id, t.tel_type, t.tel_number from CONTACT c " +
+                "left join CONTACT_TEL_DETAIL t on c.id = t.contact_id";
+
+        return jdbcTemplate.query(sql, (ResultSet rs) -> {
+            Map<Long, Contact> map = new HashMap<>();
+            Contact contact;
+            while (rs.next()) {
+                Long id = rs.getLong("id");
+                contact = map.get(id);
+                if (contact == null) {
+                    contact = new Contact();
+                    contact.setId(id);
+                    contact.setFirstName(rs.getString("first_name"));
+                    contact.setLastName(rs.getString("last_name"));
+                    contact.setBirthDate(rs.getDate("birth_date"));
+                    contact.setContactTelDetails(new ArrayList<>());
+                    map.put(id, contact);
+                }
+                Long contactTelDetailId = rs.getLong("contact_tel_id");
+                if (contactTelDetailId > 0) {
+                    ContactTelDetail contactTelDetail = new ContactTelDetail();
+                    contactTelDetail.setId(contactTelDetailId);
+                    contactTelDetail.setContactId(id);
+                    contactTelDetail.setTelType(rs.getString("tel_type"));
+                    contactTelDetail.setTelNumber(rs.getString("tel_number"));
+                    contact.getContactTelDetails().add(contactTelDetail);
+                }
+            }
+            return new ArrayList<>(map.values());
+        });
     }
 
 

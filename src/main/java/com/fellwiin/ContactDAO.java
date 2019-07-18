@@ -12,10 +12,12 @@ public interface ContactDAO {
 
     void insert(Contact contact);
 
+    void insertWithDetail(Contact contact);
+
+    List<Contact> findAllWithDetail();
+
 //    String findFirstNameById(Long id);
 //
-//    List<Contact> findAllWithDetail();
 //
-//    void insertWithDetail(Contact contact);
 //
 }

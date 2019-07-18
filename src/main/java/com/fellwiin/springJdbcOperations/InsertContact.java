@@ -19,5 +19,6 @@ public class InsertContact extends SqlUpdate {
         super.declareParameter(new SqlParameter("birth_date", Types.DATE));
         super.setGeneratedKeysColumnNames(new String[]{"id"});
         super.setReturnGeneratedKeys(true);
+
     }
 }
