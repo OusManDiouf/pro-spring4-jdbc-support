@@ -44,7 +44,7 @@ public class JdbcContactDAO implements ContactDAO, InitializingBean {
 
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() throws BeanCreationException {
         if (dataSource == null) {
             throw new BeanCreationException("Must set dataSource on ContactDAO");
         }
