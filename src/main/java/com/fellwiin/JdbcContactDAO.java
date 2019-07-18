@@ -24,16 +24,18 @@ import java.util.Map;
 public class JdbcContactDAO implements ContactDAO, InitializingBean {
 
     //    TODO: take a look at the appache logging doc for setting this config.
-    private Log log = LogFactory.getLog(JdbcContactDAO.class);
+    private Log LOG = LogFactory.getLog(JdbcContactDAO.class);
     private DataSource dataSource;
     private SelectAllContacts selectAllContacts;
     private SelectContactByFirstName selectContactByFirstName;
+    private UpdateContact updateContact;
 
     @Resource(name = "dataSource")
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
         this.selectAllContacts = new SelectAllContacts(dataSource);
         this.selectContactByFirstName = new SelectContactByFirstName(dataSource);
+        this.updateContact = new UpdateContact(dataSource);
     }
 
     public DataSource getDataSource() {
@@ -61,6 +63,19 @@ public class JdbcContactDAO implements ContactDAO, InitializingBean {
         paramMap.put("first_name",firstName);
 
         return selectContactByFirstName.executeByNamedParam(paramMap);
+    }
+
+    @Override
+    public void update(Contact contact) {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("first_name", contact.getFirstName());
+        paramMap.put("last_name", contact.getLastName());
+        paramMap.put("birth_date", contact.getBirthDate());
+        paramMap.put("id", contact.getId());
+
+        updateContact.updateByNamedParam(paramMap);
+
+        LOG.info("Existing contact updated with id: " + contact.getId() + "\n");
     }
 
 

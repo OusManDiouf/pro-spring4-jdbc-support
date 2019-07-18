@@ -3,9 +3,12 @@ package com.fellwiin;
 import java.util.List;
 
 public interface ContactDAO {
+
     List<Contact> findAll();
 
     List<Contact> findByFirstName(String firstName);
+
+    void update(Contact contact);
 //
 //    String findFirstNameById(Long id);
 //
@@ -15,5 +18,4 @@ public interface ContactDAO {
 //
 //    void insertWithDetail(Contact contact);
 //
-//    void update(Contact contact);
 }
